@@ -1,0 +1,50 @@
+%include "boot.inc"
+section loader vstart=LOADER_BASE_ADDR
+
+; 输出背景色绿色，前景色红色，并且跳动的字符串"In Loader"
+mov byte [gs:0xa0],'I'
+mov byte [gs:0xa1],0xA4     ; A表示绿色背景闪烁，4表示前景色为红色
+
+mov byte [gs:0xa2],'n'
+mov byte [gs:0xa3],0xA4
+
+mov byte [gs:0xa4],' '
+mov byte [gs:0xa5],0xA4   
+
+mov byte [gs:0xa6],'L'
+mov byte [gs:0xa7],0xA4   
+
+mov byte [gs:0xa8],'O'
+mov byte [gs:0xa9],0xA4
+
+mov byte [gs:0xaa],'A'
+mov byte [gs:0xab],0xA4
+
+mov byte [gs:0xac],'D'
+mov byte [gs:0xad],0xA4
+
+mov byte [gs:0xae],'E'
+mov byte [gs:0xaf],0xA4
+
+mov byte [gs:0xb0],'R'
+mov byte [gs:0xb1],0xA4
+
+mov byte [gs:0x190],'B'
+mov byte [gs:0x191],0x70   
+
+mov byte [gs:0x192],'y'
+mov byte [gs:0x193],0x70
+
+mov byte [gs:0x194],' '
+mov byte [gs:0x195],0x70
+
+mov byte [gs:0x196],'Y'
+mov byte [gs:0x197],0x70
+
+mov byte [gs:0x198],'B'
+mov byte [gs:0x199],0x70
+
+mov byte [gs:0x19a],'X'
+mov byte [gs:0x19b],0x70
+jmp $		       ; 通过死循环使程序悬停在此
+
