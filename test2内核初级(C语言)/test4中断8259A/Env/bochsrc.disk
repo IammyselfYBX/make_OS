@@ -1,0 +1,36 @@
+##############################################
+# Configuration file for Bochs
+#                           YBX
+############################################
+#第一步：设置Bochs在运行过程中能够使用的内存,这里是32M
+megs: 32
+
+#第二步：设置对应真是机器的BIOS、和 VGA BIOS
+romimage: file=/usr/local/src/bochs/share/bochs/BIOS-bochs-latest
+vgaromimage: file=/usr/local/src/bochs/share/bochs/VGABIOS-lgpl-latest
+
+#第三步：设置Bochs所用的磁盘
+#floppya:1_44=a.img, status=inserted
+
+#第四步：选择启动盘符
+boot: disk
+
+# 第五步：设置日志文件的输出
+log:bochs.out
+
+# 第六步：开启或关闭某些功能
+mouse:enabled=0
+#keyboard_mapping:enabled=1,
+#keymap=/usr/local/src/bochs/share/bochs/keymaps/x11-pc-us.map
+keyboard:keymap=/usr/local/src/bochs/share/bochs/keymaps/x11-pc-us.map
+
+
+# 硬盘设置
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=disk, path="hd10M.img", mode=flat, cylinders=20, heads=16, spt=63
+
+
+#增加Bochs对gdb的支持，gdb可以远程对机器的 9654 端口调试
+#gdbstub:enable=1, port=9654, text_base=0, data_base=0, bss_base=0
+
+################### 配置文件结束 ##################### 
