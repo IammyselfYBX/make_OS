@@ -1,13 +1,13 @@
-BUILD_DIR = ./build
+BUILD_DIR = ./
 ENTRY_POINT = 0xc0001500
 AS = nasm
 CC = gcc
 LD = ld
 LIB = -I lib/ -I lib/kernel/ -I lib/user/ -I kernel/ -I device/ -I thread/ -I userprog/
 ASFLAGS = -f elf
-CFLAGS = -Wall $(LIB) -c -fno-builtin -W -Wstrict-prototypes \
+CFLAGS = -m32 -Wall $(LIB) -c -fno-builtin -W -Wstrict-prototypes \
          -Wmissing-prototypes 
-LDFLAGS = -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map
+LDFLAGS = -m elf_i386 -Ttext $(ENTRY_POINT) -e main -Map $(BUILD_DIR)/kernel.map
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
       $(BUILD_DIR)/timer.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/print.o \
       $(BUILD_DIR)/debug.o $(BUILD_DIR)/memory.o $(BUILD_DIR)/bitmap.o \
@@ -17,6 +17,18 @@ OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/init.o $(BUILD_DIR)/interrupt.o \
       $(BUILD_DIR)/process.o $(BUILD_DIR)/syscall.o $(BUILD_DIR)/syscall-init.o
 
 ##############     c代码编译     ###############
+.PHONY :clean all build mv_env
+all: mbr.bin loader.bin build
+	@echo "SUCCEED"
+
+clean:
+	rm -f *.o *.map *.bin
+
+build: $(BUILD_DIR)/kernel.bin
+
+mv_env:mbr.bin loader.bin
+	mv mbr.bin loader.bin kernel.bin ../Env
+
 $(BUILD_DIR)/main.o: kernel/main.c lib/kernel/print.h \
         lib/stdint.h kernel/init.h
 	$(CC) $(CFLAGS) $< -o $@
@@ -27,7 +39,7 @@ $(BUILD_DIR)/init.o: kernel/init.c kernel/init.h lib/kernel/print.h \
 
 $(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/interrupt.h \
         lib/stdint.h kernel/global.h lib/kernel/io.h lib/kernel/print.h
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -fno-stack-protector $< -o $@
 
 $(BUILD_DIR)/timer.o: device/timer.c device/timer.h lib/stdint.h\
         lib/kernel/io.h lib/kernel/print.h
@@ -85,7 +97,7 @@ $(BUILD_DIR)/ioqueue.o: device/ioqueue.c device/ioqueue.h lib/stdint.h thread/th
 $(BUILD_DIR)/tss.o: userprog/tss.c userprog/tss.h thread/thread.h lib/stdint.h \
     	lib/kernel/list.h kernel/global.h lib/string.h lib/stdint.h \
      	lib/kernel/print.h
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) -fno-stack-protector $< -o $@
 
 $(BUILD_DIR)/process.o: userprog/process.c userprog/process.h thread/thread.h \
     	lib/stdint.h lib/kernel/list.h kernel/global.h kernel/debug.h \
@@ -111,24 +123,12 @@ $(BUILD_DIR)/print.o: lib/kernel/print.S
 $(BUILD_DIR)/switch.o: thread/switch.S
 	$(AS) $(ASFLAGS) $< -o $@
 
+mbr.bin:boot/mbr.S 
+	nasm -I boot/include/ boot/mbr.S -o mbr.bin
+
+loader.bin:boot/loader.S
+	nasm -I boot/include/ boot/loader.S -o loader.bin
 
 ##############    链接所有目标文件    #############
 $(BUILD_DIR)/kernel.bin: $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
-
-.PHONY : mk_dir hd clean all
-
-mk_dir:
-	if [[ ! -d $(BUILD_DIR) ]];then mkdir $(BUILD_DIR);fi
-
-hd:
-	dd if=$(BUILD_DIR)/kernel.bin \
-           of=/home/work/my_workspace/bochs/hd60M.img \
-           bs=512 count=200 seek=9 conv=notrunc
-
-clean:
-	cd $(BUILD_DIR) && rm -f ./*
-
-build: $(BUILD_DIR)/kernel.bin
-
-all: mk_dir build hd

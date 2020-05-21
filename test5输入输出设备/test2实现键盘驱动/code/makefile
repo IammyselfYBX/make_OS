@@ -38,7 +38,7 @@ $(BUILD_DIR)/init.o: kernel/init.c kernel/init.h lib/kernel/print.h \
 
 $(BUILD_DIR)/interrupt.o: kernel/interrupt.c kernel/interrupt.h \
         lib/stdint.h kernel/global.h lib/kernel/io.h lib/kernel/print.h
-	$(CC) $(CFLAGS) -fno-stack-protector  $< -o $@
+	$(CC) $(CFLAGS) -fno-stack-protector $< -o $@
 
 $(BUILD_DIR)/timer.o: device/timer.c device/timer.h lib/stdint.h\
         lib/kernel/io.h lib/kernel/print.h
