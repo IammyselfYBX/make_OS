@@ -16,7 +16,7 @@
 ```bach
 ./0.README.sh
 ```
-![picture/0.readme_sh.png](picture/0.readme_sh.png)
+
 
 ### 2.代码
 每个目录下的```code```文件夹，编译直接使用```make```，具体信息看```Makefile```
